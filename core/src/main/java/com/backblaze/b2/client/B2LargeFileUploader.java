@@ -43,7 +43,7 @@ class B2LargeFileUploader {
     private final B2AccountAuthorizationCache accountAuthCache;
     private final Supplier<B2RetryPolicy> retryPolicySupplier;
     private final ExecutorService executor;
-    private final B2PartSizes partSizes;
+    private final B2PartSizer partSizes;
     private final B2UploadFileRequest request;
     private final long contentLength;
 
@@ -52,7 +52,7 @@ class B2LargeFileUploader {
                         B2AccountAuthorizationCache accountAuthCache,
                         Supplier<B2RetryPolicy> retryPolicySupplier,
                         ExecutorService executor,
-                        B2PartSizes partSizes,
+                        B2PartSizer partSizes,
                         B2UploadFileRequest request,
                         long contentLength) {
         this.retryer = retryer;
@@ -67,7 +67,7 @@ class B2LargeFileUploader {
     }
 
     B2FileVersion uploadLargeFile() throws B2Exception {
-        final List<B2PartSpec> allPartSpecs = partSizes.pickParts(contentLength);
+        final List<B2PartSpec> allPartSpecs = partSizes.pickParts(request.getContentSource());
 
         // start the large file.
         final B2FileVersion largeFileVersion = retryer.doRetry("b2_start_large_file",
@@ -90,7 +90,7 @@ class B2LargeFileUploader {
         // we could use the part#1's size as the recommendedPartSize,
         // but sometimes we won't have part#1, so we could pick the lowest-numbered part's size
         // or the most common size, or we could just compute from scratch...
-        final List<B2PartSpec> allPartSpecs = partSizes.pickParts(contentLength);
+        final List<B2PartSpec> allPartSpecs = partSizes.pickParts(request.getContentSource());
 
         // figure out which parts that have already been uploaded that we can use.
         // note that if the recommended part size has changed, we will end up

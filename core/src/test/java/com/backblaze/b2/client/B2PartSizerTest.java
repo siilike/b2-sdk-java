@@ -16,10 +16,10 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class B2PartSizesTest extends B2BaseTest {
+public class B2PartSizerTest extends B2BaseTest {
     private final long GB = 1000 * 1000 * 1000;
     private final B2AccountAuthorization accountAuth = B2TestHelpers.makeAuth(1);
-    private final B2PartSizes partSizes = B2PartSizes.from(accountAuth);
+    private final B2PartSizerImpl partSizes = B2PartSizerImpl.from(accountAuth);
     private final long minSize = partSizes.getMinimumPartSize();
     private final long recSize = partSizes.getRecommendedPartSize();
 

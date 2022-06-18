@@ -4,21 +4,22 @@
  */
 package com.backblaze.b2.client;
 
+import com.backblaze.b2.client.contentSources.B2ContentSource;
 import com.backblaze.b2.client.structures.B2AccountAuthorization;
 import com.backblaze.b2.util.B2Preconditions;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class B2PartSizes implements B2FilePolicy {
+public class B2PartSizerImpl implements B2FilePolicy, B2PartSizer {
     @SuppressWarnings("FieldCanBeLocal")
     private final long MAX_SMALL_FILE_BYTES = 5L * 1000 * 1000 * 1000;
 
     private final long minimumPartSize;
     private final long recommendedPartSize;
 
-    private B2PartSizes(long minimumPartSize,
-                long recommendedPartSize) {
+    public B2PartSizerImpl(long minimumPartSize,
+                           long recommendedPartSize) {
         this.minimumPartSize = minimumPartSize;
         this.recommendedPartSize = recommendedPartSize;
     }
@@ -28,8 +29,8 @@ class B2PartSizes implements B2FilePolicy {
      * @param auth the accountAuthorization to inspect
      * @return a B2PartSizes with the sizes specified in the accountAuthorization.
      */
-    static B2PartSizes from(B2AccountAuthorization auth) {
-        return new B2PartSizes(
+    static B2PartSizerImpl from(B2AccountAuthorization auth) {
+        return new B2PartSizerImpl(
                 auth.getAbsoluteMinimumPartSize(),
                 auth.getRecommendedPartSize()
         );
@@ -62,7 +63,8 @@ class B2PartSizes implements B2FilePolicy {
         return contentLength >= (2 * recommendedPartSize);
     }
 
-    List<B2PartSpec> pickParts(long contentLength) {
+    @Override
+    public List<B2PartSpec> pickParts(long contentLength) {
         B2Preconditions.checkArgument(couldBeLargeFile(contentLength),
                 "contentLength=" + contentLength + " is too small to make at least two parts.  minimumPartSize=" + minimumPartSize);
 

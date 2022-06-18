@@ -10,7 +10,6 @@
 //
 
 apply plugin: 'java'
-apply plugin: 'maven'
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
@@ -23,8 +22,14 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    app.extendsFrom(implementation)
+}
+
+ext.b2RootProject = rootProject.name == 'b2-sdk-java' ? rootProject : rootProject.project("b2-sdk-java")
+
 ext.readVersion = { ->
-    BufferedReader reader = new BufferedReader(new FileReader(new File(rootProject.projectDir, "core/src/main/resources/b2-sdk-core/version.txt")))
+    BufferedReader reader = new BufferedReader(new FileReader(new File(b2RootProject.projectDir, "core/src/main/resources/b2-sdk-core/version.txt")))
     String version = reader.readLine().trim()
     if (version.isEmpty()) {
         throw new RuntimeException("version is empty!?")

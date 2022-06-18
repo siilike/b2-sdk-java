@@ -34,8 +34,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import static com.backblaze.b2.client.structures.B2ServerSideEncryptionMode.SSE_C;
-
 /**
  * A class for handling the creation of large files.
  *
@@ -158,7 +156,7 @@ public class B2LargeFileStorer {
     public static B2LargeFileStorer forLocalContent(
             B2FileVersion largeFileVersion,
             B2ContentSource contentSource,
-            B2PartSizes partSizes,
+            B2PartSizer partSizes,
             B2AccountAuthorizationCache accountAuthCache,
             B2StorageClientWebifier webifier,
             B2Retryer retryer,
@@ -178,7 +176,7 @@ public class B2LargeFileStorer {
     public static B2LargeFileStorer forLocalContent(
             B2StoreLargeFileRequest storeLargeFileRequest,
             B2ContentSource contentSource,
-            B2PartSizes partSizes,
+            B2PartSizer partSizes,
             B2AccountAuthorizationCache accountAuthCache,
             B2StorageClientWebifier webifier,
             B2Retryer retryer,
@@ -189,7 +187,7 @@ public class B2LargeFileStorer {
         // Convert the contentSource into a list of B2PartStorer objects.
         final List<B2PartStorer> partContentSources = new ArrayList<>();
         try {
-            for (final B2PartSpec partSpec : partSizes.pickParts(contentSource.getContentLength())) {
+            for (final B2PartSpec partSpec : partSizes.pickParts(contentSource)) {
                 final B2UploadingPartStorer localPartContentSource = new B2UploadingPartStorer(
                         partSpec.getPartNumber(),
                         createRangedContentSource(contentSource, partSpec.getStart(), partSpec.getLength()));

@@ -13,5 +13,6 @@ apply from: '../common.gradle'
 dependencies {
     // B2StorageClientFactory determines which one is used depending on
     // what's in the java classpath at runtime.
-    compile project(':httpclient')
+    implementation b2RootProject.project('httpclient')
+    implementation b2RootProject.project('core')
 }

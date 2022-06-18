@@ -142,7 +142,7 @@ public class B2StorageClientImpl implements B2StorageClient {
 
     @Override
     public B2FilePolicy getFilePolicy() throws B2Exception {
-        return getPartSizes();
+        return B2PartSizerImpl.from(retryer.doRetry("get_part_sizes", accountAuthCache, accountAuthCache::get, retryPolicySupplier.get()));
     }
 
     @Override
@@ -198,7 +198,7 @@ public class B2StorageClientImpl implements B2StorageClient {
                                                   ExecutorService executor) throws B2Exception {
         // note that we assume that the contents of the B2ContentSource don't change during the upload.
         final long contentLength = getContentLength(request.getContentSource());
-        final B2PartSizes partSizes = getPartSizes();
+        final B2PartSizer partSizes = getPartSizer();
 
         B2LargeFileUploader uploader = new B2LargeFileUploader(retryer, webifier, accountAuthCache, retryPolicySupplier, executor, partSizes, request, contentLength);
         final List<B2Part> alreadyUploadedParts = new ArrayList<>();
@@ -233,7 +233,7 @@ public class B2StorageClientImpl implements B2StorageClient {
     public B2FileVersion uploadLargeFile(B2UploadFileRequest request,
                                          ExecutorService executor) throws B2Exception {
         final long contentLength = getContentLength(request.getContentSource());
-        final B2PartSizes partSizes = getPartSizes();
+        final B2PartSizer partSizes = getPartSizer();
 
         return uploadLargeFileGuts(executor, partSizes, request, contentLength);
     }
@@ -258,7 +258,7 @@ public class B2StorageClientImpl implements B2StorageClient {
         return B2LargeFileStorer.forLocalContent(
                 storeLargeFileRequest,
                 contentSource,
-                getPartSizes(),
+                getPartSizer(),
                 accountAuthCache,
                 webifier,
                 retryer,
@@ -286,7 +286,7 @@ public class B2StorageClientImpl implements B2StorageClient {
         final B2LargeFileStorer storer = B2LargeFileStorer.forLocalContent(
                 storeLargeFileRequest,
                 contentSource,
-                getPartSizes(),
+                getPartSizer(),
                 accountAuthCache,
                 webifier,
                 retryer,
@@ -324,7 +324,7 @@ public class B2StorageClientImpl implements B2StorageClient {
     }
 
     private B2FileVersion uploadLargeFileGuts(ExecutorService executor,
-                                              B2PartSizes partSizes,
+                                              B2PartSizer partSizes,
                                               B2UploadFileRequest request,
                                               long contentLength) throws B2Exception {
         B2LargeFileUploader uploader = new B2LargeFileUploader(retryer, webifier, accountAuthCache, retryPolicySupplier, executor, partSizes, request, contentLength);
@@ -332,15 +332,12 @@ public class B2StorageClientImpl implements B2StorageClient {
     }
 
     /**
-     * NOTE: this might have to authenticate the client if there isn't currently a
-     *       cached account authorization.  that's fine.  we're probably about to
-     *       use it anyway.
-     *
-     * @return the recommendedPartSize from the server.
-     * @throws B2Exception if there's trouble.
+     * @return an object for splitting files into parts
+     * @throws B2Exception
      */
-    private B2PartSizes getPartSizes() throws B2Exception {
-        return B2PartSizes.from(retryer.doRetry("get_part_sizes", accountAuthCache, accountAuthCache::get, retryPolicySupplier.get()));
+    @Override
+    public B2PartSizer getPartSizer() throws B2Exception {
+        return B2PartSizerImpl.from(retryer.doRetry("get_part_sizes", accountAuthCache, accountAuthCache::get, retryPolicySupplier.get()));
     }
 
     /**

@@ -76,7 +76,7 @@ public class B2LargeFileStorerTest extends B2BaseTest {
     private final B2Part part3 = new B2Part(fileId(3), 3, LAST_PART_SIZE, makeSha1(3), makeMd5(3), 3333, null);
 
 
-    private final B2PartSizes partSizes;
+    private final B2PartSizer partSizes;
     private final B2AccountAuthorizationCache authCache = mock(B2AccountAuthorizationCache.class);
     private final B2StorageClientWebifier webifier = mock(B2StorageClientWebifier.class);
 
@@ -94,7 +94,7 @@ public class B2LargeFileStorerTest extends B2BaseTest {
         final B2AccountAuthorization accountAuth = mock(B2AccountAuthorization.class);
         when(accountAuth.getAbsoluteMinimumPartSize()).thenReturn(FIVE_MEGABYTES);
         when(accountAuth.getRecommendedPartSize()).thenReturn(FIVE_MEGABYTES);
-        partSizes = B2PartSizes.from(accountAuth);
+        partSizes = B2PartSizerImpl.from(accountAuth);
 
         when(webifier.getUploadPartUrl(any(), any())).thenReturn(mock(B2UploadPartUrlResponse.class));
         when(webifier.uploadPart(any(), any())).thenReturn(part1);

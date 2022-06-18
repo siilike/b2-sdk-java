@@ -21,7 +21,7 @@ public class B2PartSpec implements Comparable<B2PartSpec> {
     final long start;     // byte offset in the file (zero-based)
     final long length;    // length in bytes.
 
-    B2PartSpec(int partNumber,
+    public B2PartSpec(int partNumber,
                long start,
                long length) {
 

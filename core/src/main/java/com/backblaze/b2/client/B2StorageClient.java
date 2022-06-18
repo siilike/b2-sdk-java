@@ -98,6 +98,11 @@ public interface B2StorageClient extends Closeable {
     B2FilePolicy getFilePolicy() throws B2Exception;
 
     /**
+     * @return an object for splitting files into parts
+     */
+    B2PartSizer getPartSizer() throws B2Exception;
+
+    /**
      * Creates a new bucket with the given request.
      *
      * @param request the request to create the bucket.

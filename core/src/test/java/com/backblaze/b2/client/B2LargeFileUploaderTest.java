@@ -81,7 +81,7 @@ public class B2LargeFileUploaderTest extends B2BaseTest {
     private final B2AccountAuthorizationCache accountAuthCache = mock(B2AccountAuthorizationCache.class);
 
     private final B2AccountAuthorization ACCOUNT_AUTH = B2TestHelpers.makeAuth(1);
-    private final B2PartSizes PART_SIZES = B2PartSizes.from(ACCOUNT_AUTH);
+    private final B2PartSizer PART_SIZES = B2PartSizerImpl.from(ACCOUNT_AUTH);
 
     // a content source that's barely big enough to be a large file.
     private final B2ContentSource contentSource = mock(B2ContentSource.class);
@@ -745,7 +745,7 @@ public class B2LargeFileUploaderTest extends B2BaseTest {
         return makeUploader(PART_SIZES, executor, contentSource, listener);
     }
 
-    private B2LargeFileUploader makeUploader(B2PartSizes partSizes,
+    private B2LargeFileUploader makeUploader(B2PartSizer partSizes,
                                              ExecutorService executor,
                                              B2ContentSource contentSource,
                                              B2UploadListener listener) throws IOException {
